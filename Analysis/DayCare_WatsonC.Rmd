@@ -1,0 +1,126 @@
+---
+title: "Day Care Fines"
+output: 
+  html_document:
+    theme: cerulean
+---
+<br />
+
+## Background
+
+<div style="color:#a8a8a8;">
+The statistics are taken directly from the article ["A Fine is a Price"](http://rady.ucsd.edu/faculty/directory/gneezy/pub/docs/fine.pdf). A summary of the article is provided in order to present the study.
+</div>
+<br />
+<div style="padding-left:30px; padding-right:30px;">
+
+A study was done in Israel, in 10 private day-care centers, in the city Haifa from January 1998 until June 1998. The ten centers are open from 730 am until 4 pm. If any parents were late to pick up the children, one of the teachers had to stay until the parents arrived. A solution was offered to fix the problem, fine the parents for the time that they are late, and see if this will resolve the issue. The study was done for twenty weeks. The first four weeks are observations of normal actions. In week five, a fine was introduced in six of the ten centers, and were selected randomly. A fine of 10 NIS (currency) was placed for every ten minutes a parent was late, and was per child. At week seventeen, the fine was removed.
+
+</div>
+
+The data listed below is what was collected on the fourth week, the week before the fine, on the sixteenth week, the last week of the fine, and the twentieth week, the last week of the experiement.
+
+```{r, echo=FALSE, results='asis', out.width=300}
+# To get the "late" dataset into your R Console, 
+# you need to click the green "play" arrow in 
+# the top right corner of this gray R-Chunk. 
+# Then type:
+#   > View(late)
+# in your R Console
+late <- rbind(c(1, 37, 8, 8, 7, 6, 8, 9, 9, 12, 13, 13, 
+                15, 13, 14, 16, 14, 15, 16, 13, 15, 17),
+              c(2, 35, 6, 7, 3, 5, 2, 11, 14, 9, 16, 12, 
+                10, 14, 14, 16, 12, 17, 14, 10, 14, 15),
+              c(3, 35, 8, 9, 8, 9, 3, 5, 15, 18, 16, 14, 
+                20, 18, 25, 22, 27, 19, 20, 23, 23, 22),
+              c(4, 34, 10, 3, 14, 9, 6, 24, 8, 22, 22, 19, 
+                25, 18, 23, 22, 24, 17, 15, 23, 25, 18),
+              c(5, 33, 13, 12, 9, 13, 15, 10, 27, 28, 35, 
+                10, 24, 32, 29, 29, 26, 31, 26, 35, 29, 28),
+              c(6, 28, 5, 8, 7, 5, 5, 9, 12, 14, 19, 17, 
+                14, 13, 10, 15, 14, 16, 6, 12, 17, 13),
+              c(7, 35, 7, 10, 12, 6, 4, 13, 7, 8, 
+                5, 12, 3, 5, 6, 13, 7, 4, 7, 10, 4, 6),
+              c(8, 34, 12, 9, 14, 18, 10, 11, 6, 
+                15, 14, 13, 7, 12, 9, 9, 17, 8, 5, 11, 8, 13),
+              c(9, 34, 3, 4, 9, 3, 3, 5, 9, 5, 2, 
+                7, 6, 6, 9, 4, 9, 2, 3, 8, 3, 5),
+              c(10, 32, 15, 13, 13, 12, 10, 9, 15, 15, 15, 
+                10, 17, 12, 13, 11, 14, 17, 12, 9, 15, 13))
+late <- data.frame(c(rep("Fine",6),rep("Control",4)), late)
+colnames(late) <- c("Treatment","Center","No.ofChidren",paste("Week",1:20, sep=""))
+```
+
+```{r, echo=FALSE}
+# This code reshapes the data into "long" format.
+# To get the "Late" dataset into your R Console, 
+# you need to click the green "play" arrow in 
+# the top right corner of this gray R-Chunk. 
+# Then type:
+#   > View(Late)
+# in your R Console
+Late <- reshape(late,
+                varying = paste("Week",1:20, sep=""), 
+                v.names = "No.ofLateChildren",
+                timevar = "Week", 
+                times = 1:20, 
+                idvar = "Center",
+                new.row.names = 1:200,
+                direction = "long")
+
+```
+
+```{r, echo=FALSE}
+ReallyLate <- subset(Late, Week %in% c(4,16,20))
+knitr::kable(ReallyLate)
+```
+
+
+<br />
+
+## Analysis
+#### Question and Hypothesis
+I was able to see that throughout the study a fine was assessed to those parents that were late. What I wanted to see was the change throughout the weeks and not necessarily the fine itself. With this is mind I was able to come up with my question. Throughout the study, would the fine from week 5-16 bring about a change in the number of children that were picked up late? Or in a more simple way of stating it, will the fine succesfully decrease the amount of children that are picked up late? With this test and analysis, the level of significance is 0.05.
+$$
+  H_0: \mu_1 = \mu_2 = \mu_3 = \mu_4 = \mu_5 = \mu_6 = \mu
+$$
+$$
+  H_a: \mu_i \neq \mu \ \text{for at least one}\ i\in\{1,\ldots,m\}
+$$
+This hypothesis will not tell me specifically why the change happened, but it will tell me if there is a difference between the control and fined groups after the study was conducted.
+
+#### Data
+When looking at this data I decided to do a one-way ANOVA test looking at the interaction of the number of children who were picked up late, in accordance with the week. 
+
+```{r, echo=FALSE}
+library(pander)
+ReallyLate.aov <- aov(No.ofLateChildren ~ as.factor(Week):Treatment, data= ReallyLate)
+pander(ReallyLate.aov)
+
+```
+
+The test shows that there is sufficient evidence to reject the null hypothesis. This means that we can say with security that there is a difference in the amount of children that were picked up late, after the study was conducted.
+
+```{r, echo=FALSE}
+library(car)
+library(lattice)
+xyplot(No.ofLateChildren ~ as.factor(Week), data=ReallyLate, type=c("p","a"), groups = Treatment, auto.key = list(corner=c(1,1)), main="Fine-ally")
+
+
+```
+
+This graphic is a representation of the data. It shows that throughout the three different weeks that were observed, and as the fine was introduced, there was a general increase in the number of children that were picked up late. The control group and fined group started at about the same level, then during the fine and after the fine, the number of children that were picked up late, rose from beforehand.
+
+```{r,echo=FALSE}
+par(mfrow=c(1,2))
+plot(ReallyLate.aov, which=1:2, pch=16)
+```
+
+By running the residual plot and the QQ-Plot we are able to verify that the data is normal and that the one-way ANOVA was an appropriate test. There seems to be a small difference in variance from one week to the next, but we can say that they are generally the same. The QQ-Plot shows us that the data is normal. The data therefore is appropriate to do a one-way ANOVA.
+
+#### Interpretation
+
+This is a very interesting study. In the first four weeks of the experiment, no fine was introduced. From week 5-16 a fine was introduced for a child being picked up late. From week 17-20 the fine was removed and everyone carried on. My one-way ANOVA shows that there was a significant difference in the amount of children that were picked up late throughout the experiment. With the comparison of the control group and the fined group we are able to see what the difference is. Once the fine was assessed, more parents started to pick up there children late. This was the completely opposite of the intended purpose of the fine. The null hypothesis was rejected and it is confirmed that the fine actually increased the number of parents that pick up their children late.
+
+I think that this is a very interesting study. I would like to see this study be done in the United States and see what would happen. I think it would even be interesting to do it by state and then compare all of the states.
+

@@ -1,0 +1,85 @@
+---
+title: "Project1_WatsonC"
+output: 
+  html_document:
+    theme: cerulean
+    code_folding: hide
+---
+
+<script type="text/javascript">
+ function showhide(id) {
+    var e = document.getElementById(id);
+    e.style.display = (e.style.display == 'block') ? 'none' : 'block';
+ }
+</script>
+
+```{r, include=FALSE}
+library(mosaic)
+library(pander)
+NBA <- read.csv("C:/Users/Cortland/OneDrive/School/Stats/MAT 325/Notebook/Math 325 Notebook/Math 325 Notebook/Data/NBA.csv")
+
+```
+
+### Background
+Ever since I was a young boy, basketball has been something that has amazed me. From playing it to watching my favorite teams and players on television, I was absorbed in the sport. As I continued to play and as I realized that my hopes for an NBA career were dim, I always wanted to know what made a player a great one. For project one, I collected data from NBA.com about the fifty leading scorers of the 2016-2017 NBA season. The data is presented under the following link.
+
+##### <a href="javascript:showhide('dataset')">The DataSet </a>
+
+<div id="dataset" style="display:none;">
+
+```{r}
+knitr::kable(NBA)
+```
+
+</div>
+
+I simplified the data, as there were a lot of different statistics that were presented. Although each of those statistics is important, I particularly wanted to look at the data that is shown in the above link. 50 of the top NBA scorers, their names, games played, average minutes per game, average points per game, average shots made per game, average shots attempted per game and their shot percentage are presented. A few other interesting stats are provided, but they will not be used in this analysis.
+
+### Question and Mathematical Model
+
+For this analysis I will be trying to figure how much the attempted shots per game affect the points per game of the top fifty scorers of the NBA. To run this multiple regression I will be using the following mathematical model.
+
+$$
+  Y_i = \beta_0 + \beta_1 X_{1i} + \epsilon_i
+$$
+where $\epsilon_i\sim N(0,\sigma^2)$.
+
+I pose the hypothesis that attempted field goals are an explanatory variable of the points per game of these athletes. For this analysis, alpha or the level of significance is 0.05.
+
+### Data and Analysis
+
+```{r}
+plot(PTS ~ FGA, dat=NBA)
+
+```
+
+
+To start out the analysis of the data, I will run a qq-plot and a residuals vs fitted plot. These plots tell us the appropriateness of using a linear regression for this data. 
+
+```{r}
+NBA.lm <- lm(PTS ~ FGA, data=NBA)
+par(mfrow=c(1,2)); plot(NBA.lm, which=1:2)
+
+```
+
+As we are looking at these two plots, I have some question about how appropriate the test is. The variance seems to jump around a lot, but at second glance, the two extremes only have one or two points. Then the qq-plot also raises a red flag, but the data again seems to be fairly normal. With awareness of the likelihood that this test could be interpreted in both directions, I will continue with the analysis. I will run a simple linear regression to see how field goal attempts affects the average points per game of the players.
+
+```{r}
+pander(summary(NBA.lm))
+```
+
+This summary of the linear model shows us that a few important things. It shows us the p-values of $B_1$ and $B_0$. It also gives us an equation that we can apply to our scatter plot and allows us to see just how much of an explanatory variable shot attempts are on points per game.
+
+```{r}
+plot(PTS ~ FGA, dat=NBA)
+abline(NBA.lm)
+```
+
+### Interpretation
+
+Going back to the original question that I proposed at the beginning of the analysis, Is the number of shot attempts an explanatory variable of points per game in the NBA? Through checking the appropriateness of the test, we were able to see that the data does meet the requirements, but they are questionable. Then we look at the p-values of our test. We acknowledged that $alpha$ is 0.05 and that $B_0$ is the intercept while $B_1$ is the slope of the regression line. Our test showed that for every shot attempt the points will increase by 1.419 and this has a p-value of 1.127e-19, or very significant. The intercept on the other hand, is not significant with a p-value of 0.1303. It is statistically appropriate to say that shot attempts significantly affect the points per game.
+
+Thinking about this question, it may seem to be an obvious answer, but it is nice to have the statistics to show how much shots attempted affects a players points per game. I think that it would be nice to see more stats and collect more data to see what other factors come into play.
+
+
+

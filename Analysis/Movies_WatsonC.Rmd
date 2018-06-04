@@ -1,0 +1,56 @@
+---
+title: "Movies"
+output: 
+  html_document:
+    theme: cerulean
+---
+
+```{r, include=FALSE}
+library(mosaic)
+movies <- read.csv("../Data/movies.csv", header=TRUE)
+RMovies <- subset(movies, mpaa== " R")
+# To get the movies data into your Console, 
+# use the "Environment >> Import Dataset" command 
+# in the upper right of your RStudio window.
+```
+
+<br />
+
+<!-- Instructions: Come up with an interesting question that could be answered with the "movies" dataset that is provided above. 
+
+Write a Background that gives meaning to your question of interest.
+
+State your Question.
+
+Perform an appropriate "Analysis" that gives useful information for answering your question.
+
+Interpret your analysis and expound on your findings. -->
+
+
+#### Question
+Ever since movies have started, there has been debate over the standards that they follow. Who creates the ratings, how do we protect our families from innappropriate films, and some, like myself, question who is the one to rate these movies? Based on data that was collected, the first movie that had an " R" rating was made in 1966. The question that I have about the data collected is, when did " R" rated movies really spike? The information for this data was collected from the following link and provided by Brother Saunders, [movies](https://vincentarelbundock.github.io/Rdatasets/doc/ggplot2/movies.html).
+
+#### Data 
+
+```{r, echo=FALSE}
+RMovies <- subset(movies, mpaa== " R")
+
+barplot(table(RMovies$year))
+
+```
+
+96.7% of the data is after is during and after the year of 1993. As seen in the barplot, we see that in the year 1995 there was a jump from 71 " R" rated movies to a total of 293 total " R" rated movies. 
+
+```{r, echo=FALSE}
+RMovies2 <- subset(RMovies, year>"1992")
+table(RMovies2$year)
+
+```
+
+
+#### Interpretation
+
+A lot of different factors go into rating a movie, language, violence, sexuality, scary factors and other things. In 1995 The Church of Jesus Christ of Latter-day Saints released a document called "The Family: A Proclomation to the World". In this document, the church establishes some standards that talk about the sanctity of the family and home. In that same year, 1995 there was an increase of 222 " R" rated movies. There are a lot of different factors that may contribute to this, but at the same time, is this just a question of a drecrease of values in our society.
+
+
+

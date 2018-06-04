@@ -1,0 +1,149 @@
+---
+title: "Car Prices"
+output: 
+  html_document:
+    theme: cerulean
+    code_folding: hide
+---
+
+<script type="text/javascript">
+ function showhide(id) {
+    var e = document.getElementById(id);
+    e.style.display = (e.style.display == 'block') ? 'none' : 'block';
+ }
+</script>
+
+```{r, include=FALSE}
+library(mosaic)
+library(pander)
+CarPrices <- read.csv("C:/Users/Cortland/OneDrive/School/Stats/MAT 325/Notebook/Math 325 Notebook/Math 325 Notebook/Data/CarPrices.csv")
+
+
+```
+
+
+<br>
+
+### Background
+
+The data link following this sentence, is the data provided by Brother Saunders and was used for this analysis. 
+
+##### <a href="javascript:showhide('dataset')">The DataSet </a>
+
+<div id="dataset" style="display:none;">
+
+```{r}
+knitr::kable(CarPrices)
+```
+
+</div>
+
+This data shows 804 vehicles and their Price, Mileage, Make, Model, Trim, Type, Cylinder, Liter, Doors, Cruise, Sound and Leather. As I looked at the data I began to wonder, why do cars cost what they do? They are truly terrible investments and any number of things can go wrong with them. I began to think of how much money is spent on vehicles and how dependent we have become to useing them.
+
+### Question and Hypothesis
+
+For this analysis I will be trying to figure out what the explanatory variables are for the price of a vehicle. To run this multiple regression I will be using the following mathematical formula.
+
+$$
+  Y_i = \beta_0 + \beta_1 X_{1i} + \beta_2 X_{2i} + \cdots + \beta_p X_{pi} + \epsilon_i
+$$
+where $\epsilon_i\sim N(0,\sigma^2)$.
+
+### Data and Analysis
+
+To start off my analysis, I began with a simple linear regression to see the effect that mileage has on a vehicle's price. 
+```{r}
+CarPrices.lm <- lm(Price ~ Mileage, data=CarPrices)
+par(mfrow=c(1,2))
+plot(CarPrices.lm, which=1:2)
+pander(summary(CarPrices.lm))
+
+```
+
+The plots above show that this regression is questionable. The QQ plot does not give us hope that this data is normal and gives me question on the appropriateness of the test.
+
+Continuing forward to continue learning how to apply linear regression, I looked at the residuals of the previous regression to look and see what other variable may explain the residuals of the previous test. The plots to find that variable are shown in the following link.
+
+##### <a href="javascript:showhide('residualsofmileage')">CarPrices.lm$Residuals </a>
+
+<div id="residualsofmileage" style="display:none;">
+
+```{r}
+plot(CarPrices.lm$residuals ~ Cylinder, data=CarPrices)
+plot(CarPrices.lm$residuals ~ Model, data=CarPrices)
+plot(CarPrices.lm$residuals ~ Trim, data=CarPrices)
+plot(CarPrices.lm$residuals ~ Type, data=CarPrices)
+plot(CarPrices.lm$residuals ~ Liter, data=CarPrices)
+plot(CarPrices.lm$residuals ~ Doors, data=CarPrices)
+plot(CarPrices.lm$residuals ~ Cruise, data=CarPrices)
+plot(CarPrices.lm$residuals ~ Sound, data=CarPrices)
+plot(CarPrices.lm$residuals ~ Leather, data=CarPrices)
+plot(CarPrices.lm$residuals ~ Make, data=CarPrices)
+
+```
+
+</div>
+
+By looking at the plots we are able to see that model of the vehicle has a lot to offer us. Model is then added to the previous regression to see the impact that it has.
+
+```{r}
+CarPrices.lm2 <- lm(Price ~ Mileage+Model, data=CarPrices)
+plot(CarPrices.lm2, which=1:2)
+
+```
+
+##### <a href="javascript:showhide('5')">Regression 2 </a>
+
+<div id="5" style="display:none;">
+
+```{r}
+pander(summary(CarPrices.lm2))
+```
+
+</div>
+
+This regression is a little more promising to me. The QQ plot looks better and the residuals plot does have somewhat of a pattern, but we will continue to look for more explanatory variables for this regression. The residual plots to find the other variable are found in the following link.
+
+##### <a href="javascript:showhide('2')">Residuals of Regression 2 </a>
+
+<div id="2" style="display:none;">
+
+```{r}
+plot(CarPrices.lm2$residuals ~ Cylinder, data=CarPrices)
+plot(CarPrices.lm2$residuals ~ Make, data=CarPrices)
+plot(CarPrices.lm2$residuals ~ Trim, data=CarPrices)
+plot(CarPrices.lm2$residuals ~ Type, data=CarPrices)
+plot(CarPrices.lm2$residuals ~ Liter, data=CarPrices)
+plot(CarPrices.lm2$residuals ~ Doors, data=CarPrices)
+plot(CarPrices.lm2$residuals ~ Cruise, data=CarPrices)
+
+```
+
+</div>
+
+As we look at this last set of plots we are able to see that trim may have some information to add to this plot. We will now run a regression to see if it adds anything.
+
+```{r}
+CarPrices.lm3 <- lm(Price ~ Mileage+Model+Trim, data=CarPrices)
+plot(CarPrices.lm3, which=1:2)
+
+```
+
+##### <a href="javascript:showhide('1')">Regression 3 </a>
+
+<div id="1" style="display:none;">
+
+```{r}
+pander(summary(CarPrices.lm3))
+```
+
+</div>
+
+The residual plot seems to be changing and becomeing more appropriate, although there is still some question to its appropriateness. The QQ plot also seems to be having a good progression but is also questionable.
+
+###Interpretation
+
+As we look at the regression from the beginning, we did not really have a lot of great results testing the appropriateness of the test. The QQ plot and the residuals plot did not look very promising, and the appropriateness of the regression is questionable. THe first regression gave us an adjusted R^2 of 0.01924, which is not very promising or helpful, but the t test p-values for the mileage and intercept were significantly under alpha of 0.05. As we looked for another explanatory variable, we found that Model was a factor that had a lot of information to offer. This gave us reason to run another regression by adding Model to the previous. The second residual gave us an adjusted R^2 of 0.9674 which is very good. This means that the two variables of Mileage and Model have a lot to do with the pricing of a vehicle. Still we wanted to improve so we looked at the second regression's residuals trying to find another explanatory variable. We found that Trim might still have something to offer. Therefore, we ran a third regression to find what information was still available. We found that the adjusted R^2 was now 0.9915. That tells us that when looking at the vehicles price, the Mileage, Model and Trim are great explanatory variables.
+
+With further investigation we might be able to have data that fits our requirements in a much more appropriate way. Although this regression and data did not meet those requirements, it was great help being able to use the data to learn about regression.
+

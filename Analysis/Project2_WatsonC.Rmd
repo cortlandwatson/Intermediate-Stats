@@ -1,0 +1,121 @@
+---
+title: "Project 2"
+output: 
+  html_document:
+    theme: flatly
+    code_folding: hide
+---
+
+<script type="text/javascript">
+ function showhide(id) {
+    var e = document.getElementById(id);
+    e.style.display = (e.style.display == 'block') ? 'none' : 'block';
+ }
+</script>
+
+```{r, include=FALSE}
+library(mosaic)
+library(pander)
+StCu <- read.csv("C:/Users/Cortland/OneDrive/School/Stats/SC.csv", header=FALSE)
+
+```
+
+###Background
+
+In the NBA this past year, there was a lot of debate on the MVP selection and then the performance of the MVP Steph Curry in the playoffs. Steph Curry appeared to be attacked by many people in analytics and other players in the NBA for his playoff in the playoffs. The data below shows Steph Curry's performance for the past two years in the NBA playoffs. This data was collected from ESPN.com.
+
+##### <a href="javascript:showhide('dataset')">The DataSet </a>
+
+<div id="dataset" style="display:none;">
+
+```{r}
+knitr::kable(StCu)
+```
+
+</div>
+
+Our question for this model is, If Steph Curry scores 30 points in a playoff game, does his team(Warriors) win?
+
+### Logistic Model
+
+To model the probability of the Warriors winning a game with Steph Curry's scoring, we could apply the logistic regression model
+$$
+  P(Y_i = 1|x_i) = \frac{e^{\beta_0+\beta_1 x_i}}{1+e^{\beta_0 + \beta_1 x_i}} = \pi_i
+$$
+where for observation $i$: 
+
+* $Y_i = 1$ denotes a win for the Warriors, 
+* $Y_i=0$ denotes a loss, and 
+* $x_i$ denotes the points that Steph Curry scored. 
+
+Note that if $\beta_1$ is zero in the above model, then $x_i$ (points) provides no insight about the probability of a win. Thus, we could test the hypothesis that
+
+$$
+  H_0: \beta_1 = 0 \\
+  H_a: \beta_1 \neq 0
+$$
+
+## Analysis
+
+###Fitting the Model
+
+In order to calculate $\beta_0$ and $\beta_1$ for the data, we apply the following regression.
+
+```{r}
+SC1.glm <- glm(V2 ~ V3, data=StCu, family=binomial)
+pander(summary(SC1.glm))
+```
+
+With this information we are able to get the estimated model for $\pi_i$. This is ...
+$$
+  P(Y_i = 1|x_i) \approx \frac{e^{-3.313+0.1577 x_i}}{1+e^{-3.313+0.1577 x_i}} = \hat{\pi}_i
+$$
+Where $b_0 = -3.313$ is the value of the `(Intercept)` which estimates $\beta_0$ and $b_1 = 0.1577$ is the value of `V3`/`Score` which estimates $\beta_1$.
+
+The $p$-value for the test of `V3`/`Score` shows a significant result $(p = 0.01525)$, because it is lower than 0.05, giving us sufficient evidence to say that $\beta_1 \neq 0$, which allows us to make the inference that Steph Curry's scoring effects the probability of a wind for the Warriors.
+
+###Vizualizing the Model
+
+In order to see what this looks like, we will make a plot that shows the logistic curve and allows us to visualize what we are doing. 
+
+```{r}
+plot(V2 ~ V3, data=StCu, main="Curry Scores Win", ylab='Probability of Warriors Winning', pch=16)
+curve(exp(-3.313+0.1577*x)/(1+exp(-3.313+0.1577*x)), from=11, to=40, add=TRUE)
+```
+
+###Diagnosing the Model
+
+In order to find out if the logistic regression is a good fit to these data we apply the Hosmer-Lemeshow goodness of fit test.
+
+```{r, include=FALSE}
+library(ResourceSelection)
+```
+```{r}
+pander(hoslem.test(SC1.glm$y, SC1.glm$fitted, g=6))
+```
+
+The null hypothesis is that the logistic regression is a good fit for the data, with the p-value being 0.7437 we are able to claim that the logistic regression is appropriate.
+
+###Interpretation
+
+Since we are looking at how many points Steph Curry scores, and you cannot score negative points, we hold the value of $e^{b_0}$ to be not interpretable. However, the value of $e^{b_1} = e^{0.1577} \approx 1.170815$ shows that the odds of the o-rings failing for a given launch decreases by a factor of 1.170815 for every 1 point scored.
+$$
+  P(Y_i = 1|x_i) \approx \frac{e^{-3.313+0.1577\cdot 30}}{1+e^{-3.313+0.1577 \cdot 30}} = \hat{\pi}_i
+$$
+which, using R to do this calculation we get $\hat{\pi_i} \approx$
+
+```{r}
+pander(predict(SC1.glm, data.frame(V3=30), type='response'))
+```
+
+This shows us that if Steph Curry scores 30 in a playoff game, his team has a probability of 0.8053 of winning. What if we increase this to 35?
+
+```{r}
+pander(predict(SC1.glm, data.frame(V3=35), type='response'))
+```
+
+....and if we go the opposite direction....
+
+```{r}
+pander(predict(SC1.glm, data.frame(V3=20), type='response'))
+```

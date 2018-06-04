@@ -1,0 +1,51 @@
+---
+title: "The IQ of Identical Twins"
+output: 
+  html_document:
+    theme: cerulean
+---
+
+```{r, include=FALSE}
+library(mosaic)
+library(pander)
+library(car)
+High <- subset(Burt, class == "high")
+
+
+```
+
+<br />
+
+#### Background
+
+Is intelligence inherited or earned? In May of 1966 a study addressing this question was published in the British Journal of Psychology by the author Cyril Burt. Although the conclusions of the study were fascinating, evidence came to light after Burt's death that suggested the data was falsified. The abstract of [the original article](http://onlinelibrary.wiley.com/doi/10.1111/j.2044-8295.1966.tb01014.x/abstract) read as follows, 
+
+<div style="padding-left:15px; padding-right:15px;">
+
+"In the course of a series of investigations into various aspects of mental inheritance an intensive study has been made of so-called identical twins. The cases examined...those separated in early infancy, and brought up apart... Despite wide differences in environmental conditions, the correlations for intelligence, unlike those for school attainments, prove to be surprisingly high. It is argued that this implies that intelligence, when adequately assessed, is largely dependent on genetic constitution..."
+
+</div>
+
+Without evidence, or data, I feel it is safe to conclude that people of a higher socio-economic class have a higher chance for education. For this purpose, I have chosen to analyze the data of the "high" economic class in order to simplify the data. Does the genetic makeup of an individual determine their IQ?
+
+
+#### Data and Graphics
+For all of the data collected, a paired sample t-Test was run to find out if the genetic constitution makes the individuals IQ.
+```{r, echo=FALSE}
+pander(t.test(Burt$IQbio, Burt$IQfoster, paired = TRUE, mu = 0, alternative = "two.sided", conf.level = 0.95))
+```
+
+The high p-value obtained through the paired sample t-Test for the entire data set showed that we fail to reject the null. To answer the question that I proposed a qq-plot was made with the data of the "High" group to see if the data is normal. A paired sample t-Test was run in order to analyze the data collected for those of "High" socio-economic class. Then in order to present the data in an organized and easy to understand way, a histogram mixed with a stripchart was made with the data from the "High" data set.
+```{r, echo=FALSE}
+pander(t.test(High$IQbio, High$IQfoster, paired = TRUE, mu = 0, alternative = "two.sided", conf.level = 0.95 ))
+boxplot(High$IQbio-High$IQfoster, pch=16, horizontal=TRUE)
+stripchart(High$IQbio-High$IQfoster, pch=16, method="stack", add=TRUE)
+qqPlot(High$IQbio-High$IQfoster)
+
+```
+
+The paired sample t-Test shows that the t-score is -2.097, the degrees of freedom of the data set is 6. The test also shows that the p-value of the two sided test is 0.08081, which is insufficient evidence to reject the null. The histogram organizes the data and the qq-plot shows that the data collected is normal.
+
+#### Interpretation
+
+The data that was collected shows that the data collected is of a normal distribution. Secondly the data shows that the test statistic is -2.097 with a p-value of 0.08081 which is somewhat close to being able to reject the null. Although, we fail to reject the null in this instance. To answer the question originally posted, twins have about the same IQ levels, thus suggesting that intelligence is genetic. I Would like to mention that the observations are few, the data is not very detailed or complete and there are some things that I would like to change with the experiment. I would like to take twins who are raised in different socio-economic classes and test them, one twin raised in a high class and their twin raised in a lower class. I think that this data would more accurately represent genetics, while still including twins of the same socio-economic classes.

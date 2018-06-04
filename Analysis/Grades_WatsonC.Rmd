@@ -1,0 +1,82 @@
+---
+title: "Predicting Grades"
+output: 
+  html_document: 
+    theme: cerulean
+    code_folding: hide
+---
+
+<script type="text/javascript">
+ function showhide(id) {
+    var e = document.getElementById(id);
+    e.style.display = (e.style.display == 'block') ? 'none' : 'block';
+ }
+</script>
+
+```{r, include=FALSE}
+library(mosaic)
+library(pander)
+library(ResourceSelection)
+Grades <- read.csv("../Data/Grades.csv", header=TRUE)
+```
+
+###Background and Question
+
+This data was collected from Brother Saunders' MAT 325 class from two semesters ago. Data was collected in regards to the student's final grade, their final exam score, the days that they missed and a categorical column on how many days were missed. The data is shows in the following link.
+
+##### <a href="javascript:showhide('dataset')">The DataSet </a>
+
+<div id="dataset" style="display:none;">
+
+```{r}
+knitr::kable(Grades)
+```
+
+</div>
+
+For this analysis we are hoping to see the probability that a student will earn an A in Math 325 based on their Final Exam score and whether they missed Few, Many, or No classes during the semester. 
+
+###Data Analysis
+
+To start this analyis, we will run the logistic regression to see what the data can answer in regards to our question.
+
+```{r}
+Grades1.glm <- glm( (CourseGrade == "A") ~ FinalExamScore + Missed, data=Grades, family=binomial)
+pander(summary(Grades1.glm))
+```
+
+
+
+After running the logistic regression, we are able to see some interesting statistics. With our alpha being 0.05, we see that only onve variable may have sufficient evidence.
+
+Now that we have run a test on the data, we must see if the test was actually a good fit for this analysis. We do this by running the hoslem.test command.
+
+```{r}
+pander(hoslem.test(Grades1.glm$y, Grades1.glm$fitted.values))
+```
+
+This test shows us that the logistic regression was a good fit. With the null hypothesis being that the logistic regression is not a good fit, our p-value does not allow us to deny that claim.
+
+```{r}
+plot( (CourseGrade == "A") ~ FinalExamScore, data=Grades)
+curve( exp(-14.624 + 20.958*x)/(1 + exp(-14.624 + 20.958*x)), col="green", add=TRUE)
+curve( exp(-14.624 + 20.958*x + -2.700)/(1 + exp(-14.624 + 20.958*x + -2.700)), col="blue", add=TRUE)
+curve( exp(-14.624 + 20.958*x + 3.819)/(1 + exp(-14.624 + 20.958*x + 3.819)), col="red", add=TRUE)
+
+```
+
+
+
+###Interpretation
+
+Although we have a lot of good data and a lot of information through this analysis, we cannot accept that class attendence has a significant impact on whether or not a student will pass MATH 325. If a student misses no to many days of class, the p-values never come below alpha of 0.05, which mean that we have insufficient evidence to say that they play a role in a student getting an "A". On the other hand, when we look at the Final Exam Score, we are able to see another story. 
+
+We interpret the `FinalExamScore` variable as the effect that the final exam score will have on the odds of getting an "A" in the class, $e^{20.96} = `r exp(20.96)`$. This means there is a very high increase in the odds of a student receiving an "A" in Brother Saunder's 325 class.
+
+The final conclusion is that there is sufficient evidence, p-value < 0.05, to conclude that those that score highly on the final exam, will likely get an "A" in MATH 325. 
+
+
+
+
+
+

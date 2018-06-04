@@ -1,0 +1,113 @@
+---
+title: "Recalling Words"
+output: 
+  html_document:
+    theme: cerulean
+---
+
+<script type="text/javascript">
+ function showhide(id) {
+    var e = document.getElementById(id);
+    e.style.display = (e.style.display == 'block') ? 'none' : 'block';
+ }
+</script>
+
+```{r, include=FALSE}
+library(mosaic)
+library(DT) #You may need to run: install.packages("DT")
+library(pander)
+
+```
+
+<br />
+
+#### Background
+
+Many teachers and other educators are interested in understanding how to best deliver new content to students. In general, they have two choices of how to do this.
+
+1. The Meshed Approach
+    * Deliver new content while simultaneously reviewing previously understood content.
+
+2. The Before Approach
+    * Deliver new content after fully reviewing previously understood content.
+
+A study was performed to determine whether the *Meshed* or *Before* approaches to delivering content had any positive benefits on memory recall. 
+
+<div style="padding-left:15px;">
+
+##### <a href="javascript:showhide('uniquename')">The Experiment </a>
+
+
+<div id="uniquename" style="display:none;">
+
+Individuals were seated at a computer and shown a list of words. Words appeared on the screen one at a time, for two seconds each, until all words had been shown (40 total). After all words were shown, they were required to perform a few two-digit mathematical additions (like 15 + 25) for 15 seconds to avoid immediate memory recall of the words. They were then asked to write down as many of the 40 words as they could remember. They were given a maximum of 5.3 minutes to recall words.
+
+The process of showing words and recalling words was repeated four times with the same list of words each time (four chances to get it right). The presentation of the first trial was the same for all treatment conditions. However, trials 2, 3, and 4 were slightly different for each treatment condition.
+
+<div style="padding-left:15px;">
+
+The `SFR` group (the control group) stands for Standard Free Recall. In all four trials the same list of 40 words was presented, in a random order each time.
+
+The `Before` group also used the same 40 words during each trial. However, any words that were correctly recalled in a previous trial were presented first, or *before* the words that were not recalled in the last trial. After all the correct words were presented in random order, the non-recalled words were presented in a random order.
+
+The `Meshed` group also used the same 40 words during each trial. However, words that were correctly recalled in a previous trial were alternated with a missed word during the next presentation order. 
+
+</div>
+
+The data records the number of correctly recalled words (out of the 40 possible) from the fourth trial. Results were obtained for 30 students, 10 in each of the three treatment groups: `SFR`, `Before`, and `Meshed`. 
+
+</div>
+
+##### <a href="javascript:showhide('uniquename2')">The Data </a>
+
+<div id="uniquename2" style="display:none;">
+
+The results from the study can be found in the `Friendly` data set in R after loading `library(mosaic)`.  
+
+------
+
+```{r, echo=FALSE}
+datatable(Friendly, options=list(lengthMenu = c(3,10,30)))
+```
+
+------
+
+</div>
+</div>
+
+<br />
+
+#### Question and Hypothesis
+As we look at this data we wish to analyze it in order to come up with conclusions that will help us to better teach and study. The null hypothesis is that all learning methods are the same. I wish to just look at the data set of which method is better, "Meshed" or "Before"? The null and alternative hypothesis are thus represented in the following...
+$$
+  H_0: \text{Difference in medians} = 0
+$$
+$$
+  H_a: \text{Difference in medians} \neq 0
+$$
+
+
+#### Data
+By using the data from the Friendly dataset I was able to create the following graphic and the corresponding Wilcoxon Ranked-Sum test. This test will allow us to see if the null hypothesis is correct, or if there is a difference in the two methods, thus supporting the alternative hypothesis. We will run the test while maintaining the level of significance to be 0.05.
+```{r, echo=FALSE}
+boxplot(correct ~ condition, data = droplevels(subset(Friendly, condition %in% c("Before","Meshed"))), xlab="Number Correct", ylab="Method", main="Method Recall", pch=16, horizontal=TRUE)
+stripchart(correct ~ condition, data = droplevels(subset(Friendly, condition %in% c("Before","Meshed"))), pch=16, method="stack", add=TRUE)
+
+```
+This graphic is a representation of the two different methods, "Before" and "Meshed". Through the graphic we might be able to see that the "Before" method is a little more productive. The graphic represents the data and shows a left skew on the "Before" data and suggests that this method is more effective. In order to see if this is true, we must run the Rank-Sum test in order to see if the results are significant.
+
+
+```{r, echo=FALSE}
+pander(wilcox.test(correct ~ condition, data = subset(Friendly, condition %in% c("Before","Meshed"))))
+
+```
+
+The Wilcoxon Rank-Sum test states that the test statistic is 62 and that the p-value is 0.378. Based on the graphic, we may think that the "Before" method is more effective, but because the level of significance is 0.05 and the p-value of our test is 0.378, we have to make a different statement.
+
+#### Interpretation
+
+With the null hypothesis being that the two methods of "Before" and "Meshed" are equally effective and the alternative hypothesis being that they are not equal, we can now make an inference on the data. With our level of significance being that of 0.05 and our p-value of 0.378 we are unable to state that the null hypothesis is incorrect. So, to answer the question of which test is more effective, we have to say that based on the Rank-Sum test I just performed, there is no difference in the effectiveness of the tests, or in other words we fail to reject the null.
+
+In other situations I would like to see a repeat of this data. I think that by increasing the sample size we would be able to see more accurate results. I feel that by limiting the sample size to ten per method, we limit the results of our test and are unable to come up with the truth.
+
+

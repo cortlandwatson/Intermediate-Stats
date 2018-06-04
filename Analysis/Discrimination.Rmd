@@ -1,0 +1,31 @@
+---
+title: "Discrimination"
+output: 
+  html_document: 
+    theme: cerulean
+---
+
+<br />
+
+#### Background
+
+Sometime around 1965 a survey was conducted where students at a certain university were asked the following question. "Do you think that some racial and religious groups should be prevented from living in certain sections of cities?" A summary of their response are recorded in the following table. The region of the United States that the student respondent was from was also recorded.
+
+<div style="padding-left:20%; padding-right:20%;">
+
+| Region | *Agree* | *Undecided* | *Disagree* |
+|--------|---------|-------------|------------|
+| East   |  89     |  79         |  297       |
+| Midwest| 118     | 130         |  350       |
+| South  | 241     | 140         |  248       |
+| West   |  37     |  59         |  197       |
+
+</div>
+
+```{r}
+discrim <- matrix(c(89,79,297,118,130,350,241,140,248,37,59,197), ncol = 3, byrow = T)
+colnames(discrim) <- c("Agree","Undecided","Disagree")
+rownames(discrim) <- c("East","Midwest","South","West")
+```
+
+

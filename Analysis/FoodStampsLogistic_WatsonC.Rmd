@@ -1,0 +1,78 @@
+---
+title: "Simple Logistic Regression"
+output: 
+  html_document:
+    theme: cerulean
+    code_folding: hide
+---
+
+## Food Stamp Participation {.tabset}
+
+"The Data" tab shows us the data that was worked with, and icludes an explanation of the data. "The Report" tab includes the analysis of the data in the other tab.
+
+```{r, include=FALSE}
+library(mosaic)
+library(robustbase)
+library(pander)
+library(ResourceSelection)
+```
+
+### The Report
+
+#### Analysis and Question
+
+Can monthly income be used to predict whether or not a person that rented their home will participate in the food stamp program?
+
+In order to start our analysis, I will present a graphic that shows what is going on. 
+
+```{r}
+foodstamp2 <- subset(foodstamp, tenancy==0)
+plot(participation ~ income, data=foodstamp2)
+curve( exp(0.1845 + -0.001993*x)/(1 + exp(0.1845 + -0.001993*x)), add=TRUE)
+
+```
+
+Just by looking at the data, I am lead to believe that this is not a good example to use Logistic Regression. I state this because for a Logistic Regression we are looking to have data that has a slight mesh, but that is not overpowering. For example, we want to interlock our fingers with maybe one or two fingers, not all five in order to produce good data for a Logistic Regression.
+
+The Logistic Curve suggests that there is a pattern, but that the pattern is not very strong. 
+
+```{r}
+foodstamp.glm <- glm(participation ~ income, data=foodstamp2, family=binomial)
+pander(summary(foodstamp.glm))
+```
+
+
+Now as we run the test, we are able to see that there is enough data to have results, but not the desired results. We are able to get values, but the p-value is where the truth lies. Income has a p-value of 0.1411 and the intercept has a p-value of 0.7535.
+
+#### Diagnosing the Model
+
+As we look to diagnose the model, we are trying to see if the Logistic Regression was a good choice for this data. The hoslem test has a null hypothesis that the Logistic Regression is not appropriate. Therefore, if we have a p-value of less than 0.05, then we cannot use the hoslem, but if it is higher, we are able to see that it is appropriate. 
+
+```{r}
+pander(hoslem.test(foodstamp.glm$y, foodstamp.glm$fitted.values))
+
+```
+
+This test shows us that the Logistic Regression is a good fit for this data, so the results from the test are able to be represented correctly by the test that we had previously performed. 
+
+#### Interpretation
+
+Our original question was, Can monthly income be used to predict whether or not a person that rented their home will participate in the food stamp program? Through running our analysis we are able to state a few things. First, the Logistic Regression is appropriate for this data. Second, the values that we got do not tell us much. Both income and the intercept have p-values higher than that of 0.05. This means that we have insufficient evidence to reject the null. In other words, we do not have sufficient evidence to claim that income can be used to predict whether a tenant will be on food stamps. 
+
+I think that it would be very interesting to look at a larger sample and to ask this same question. I also think that it would be interesting to sample everyone and not just the older US population.
+
+### The Data
+
+#### Background
+
+Data was collected from 150 randomly selected elderly US citizens about their `participation (yes = 1, no = 0)` in the government food stamp program. We also collected data on what their `tenancy (owned = 1, rented = 0)` status was, whether or not they received supplemental income, `suppl.income (yes = 1, no = 0)`, like social security income, and what their monthly `income` was in US dollars. With this data we are hoping to represent the US Citizens and provide valuable information on food stamps and those that use the program.
+
+The question for this analysis is as follows. Can monthly income be used to predict whether or not a person that rented their home will participate in the food stamp program?
+
+```{r, echo=FALSE, results='asis'}
+foodstamp2 <- subset(foodstamp, tenancy==0)
+knitr::kable(foodstamp2)
+```
+
+
+

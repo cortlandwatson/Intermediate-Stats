@@ -1,0 +1,73 @@
+---
+title: "Permutation Test"
+output: 
+  html_document:
+    theme: cerulean
+    code_folding: hide
+---
+
+<script type="text/javascript">
+ function showhide(id) {
+    var e = document.getElementById(id);
+    e.style.display = (e.style.display == 'block') ? 'none' : 'block';
+ }
+</script>
+
+```{r, include=FALSE}
+library(mosaic)
+library(coin)
+library(pander)
+```
+
+### Background and Question
+
+The data that is presented in the link below is collected from marriage records in Mobile County, Alabama.
+
+##### <a href="javascript:showhide('dataset')">The DataSet </a>
+
+<div id="dataset" style="display:none;">
+
+```{r}
+knitr::kable(Marriage)
+```
+
+</div>
+
+The question that we are pursuing is as follows:
+Is there a difference in ages between spouses?
+
+###Paired Analysis
+
+For this analysis there is a lot of coding. You can find the coding that has been performed by clicking the Code box that you find right below this arrow ------------------------------------------------>
+
+```{r}
+bride <- subset(Marriage, person == "Bride", select = c("bookpageID", "person", "age"))
+groom <- subset(Marriage, person == "Groom", select = c("bookpageID", "person", "age"))
+Marriage2 <- merge(bride, groom, by="bookpageID")
+
+t.obs <- mean(Marriage2$age.x - Marriage2$age.y)
+
+N <- 2000
+t.sim <- rep(NA,N)
+for (i in 1:N){
+  t.sim[i] <- mean(  (Marriage2$age.x - Marriage2$age.y) * sample(c(1,-1), 49, replace = TRUE) )
+}
+#hist(t.sim)
+#abline(v = t.obs)
+pval <- (  sum(t.sim <= t.obs) + 1)/N * 2
+
+```
+
+```{r}
+hist(Marriage2$age.x - Marriage2$age.y, xlab="GroomAge - BrideAge", main="Marriage Age Difference", col="green4")
+```
+
+The above histogram is a representation of the difference in ages between the bride and groom in Mobile County. 
+
+Through our analysis and doing the permutation test we were able to calculate a p-value of 0.002.
+
+###Interpretation
+
+With our original question of having a difference in ages between spouses, we have been able to come up with a conclusion. The p-value of the test is 0.002 which is below our alpha level of 0.05. This means that we have sufficient evidence to reject the null, meaning that there is a difference in the ages between spouses.
+
+

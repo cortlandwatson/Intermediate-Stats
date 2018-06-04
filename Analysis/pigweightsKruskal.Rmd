@@ -1,0 +1,56 @@
+---
+title: "Pig Birth Weights -- Kruskal-Wallis"
+output: 
+  html_document:
+    theme: cerulean
+---
+
+<br />
+
+#### Background
+
+This experiment was included in the original research paper by Kruskal and Wallis ([Use of Ranks in One-Criterion Variance Analysis, 1952](http://www.jstor.org/stable/2280779?seq=1#page_scan_tab_contents)) to demonstrate the Kruskal-Wallis test.
+
+"Snedecor's data on the birth weight of pigs [Snedecor, George W., Statistical Methods, Ames, Iowa State College Press, 1937 and later, Table 10.12] are shown in" the table below.
+
+```{r, include=FALSE}
+library(mosaic)
+```
+
+
+```{r, echo=FALSE, results='asis'}
+pigweights <- data.frame(Subject=1:56,
+                   Litter=factor(rep(1:8, c(10,8,10,8,6,4,6,4))),
+                   Weight=c(2.0,2.8,3.3,3.2,4.4,3.6,1.9,3.3,2.8,1.1,
+                            3.5,2.8,3.2,3.5,2.3,2.4,2.0,1.6,
+                            3.3,3.6,2.6,3.1,3.2,3.3,2.9,3.4,3.2,3.2,
+                            3.2,3.3,3.2,2.9,3.3,2.5,2.6,2.8,
+                            2.6,2.6,2.9,2.0,2.0,2.1,
+                            3.1,2.9,3.1,2.5,
+                            2.6,2.2,2.2,2.5,1.2,1.2,
+                            2.5,2.4,3.0,1.4))
+knitr::kable(pigweights, align='l')
+```
+
+The research question surrounding the data was weather or not the various weights of pigs in the different litters were comparable or not.
+
+#### Analysis
+
+Note that the assumptions of an ANOVA test do not appear to be violated for these data. However, in keeping with the presentation of the original authors of the Kruskal-Wallis test, this data will be analyzed with a Kruskal-Wallis Test.
+
+The null hypothesis is that the various litters represent samples of weights from the same population. The alternative hypothesis is that at least one of the samples is from a different population, with similar shape, but shifted either higher or lower than the others.
+
+```{r, comment=NA}
+kruskal.test(Weight ~ Litter, data=pigweights)
+```
+
+It appears that at least one litter represents a sample of weights that are from a different population than the others $(p=0.009663)$. 
+
+#### Interpretation
+
+While the results of the test show that not all litters are coming from the same weight distribution, it is difficult to decipher what is going on. Litter 3 had the heaviest weighing pigs while Litter 7 had the lowest weighing pigs. However, the Kruskal-Wallis test does not provide information as to why the null hypothesis was rejected, only that at least one of these litters is different from the others. At this point it would be beneficial to understand more about the circumstances surrounding each litter so that the full story can be pieced together. 
+
+```{r}
+xyplot(Weight ~ Litter, data=pigweights, pch=16, vertical=TRUE,
+           xlab="Litter", type=c("p","a"))
+```

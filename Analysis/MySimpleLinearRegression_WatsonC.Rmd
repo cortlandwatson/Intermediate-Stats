@@ -1,0 +1,99 @@
+---
+title: "Simple Linear Regression"
+output: 
+  html_document:
+    theme: cerulean
+    code_folding: hide
+---
+
+<script type="text/javascript">
+ function showhide(id) {
+    var e = document.getElementById(id);
+    e.style.display = (e.style.display == 'block') ? 'none' : 'block';
+ }
+</script>
+
+```{r, include=FALSE}
+library(mosaic)
+library(pander)
+```
+
+
+<br />
+
+<!-- Directions
+
+Come up with a simple linear regression of your own creation. 
+
+* This can be data you collect from 
+    - the internet (like weather data, Facebook data, or sports data) 
+    - your own experiment 
+    - your own observational study
+    - an R dataset
+
+* You need at least $n=3$ $(X,Y)$ pairs to perform the regression. However, your regression will only be useful if you can get around $n=10$ or more observations.
+
+* Write the Background, then perform the analysis like usual and interpret your results.
+
+-->
+
+
+### Background
+
+In 1997 a statistician collected a convenience sample on a fourth grade classroom in Ann Arbor, MI. The statistician, Mary C. Meyer, collected data on the students in several different categories. The categories are name, birth months, birth year, length of the longer foot, width of the longer foot, gender, which foot is bigger and which is their dominant hand. The data is presented below as you click on "The Dataset". As a young boy I always remember my stepfather picking on the size of my feet, as well as those of my brothers. This being said, for this analysis we will be looking at the relationship between the width and length of these fourth grade students and see if there are any trends.
+
+##### <a href="javascript:showhide('dataset')">The DataSet </a>
+
+<div id="dataset" style="display:none;">
+
+```{r}
+KidsFeet.lm <- lm(width ~ length, data=KidsFeet)
+knitr::kable(KidsFeet)
+```
+
+</div>
+
+###Question and Hypothesis
+
+The hypotheses for our study concerns the slope. If the slope is zero, then there is not a meaningful relationship between the width and the length of the students feet. As for previous tests, alpha continues to be 0.05, or in other words, the level of significance of the test must be below 0.05 in order to accept the results. 
+
+$$
+  H_0: \beta_1 = 0
+$$
+$$
+  H_a: \beta_1 \neq 0
+$$
+
+In other words, I am saying that length is an explanatory factor in the width of a fourth grade students foot. The data shown shows that there is a positive relationship between the width and length of the students feet, now we only have to check appropriateness of the linear regression and then run the test to see if it is really significant. 
+
+```{r}
+plot(width ~ length, data=KidsFeet)
+abline(KidsFeet.lm)
+```
+
+
+
+###Data Analysis
+####Appropriateness
+
+```{r}
+plot(KidsFeet.lm, which=1:2)
+```
+
+These two plots tell us some important information. First, the residuals vs fitted plot shows us that the relationship between width and length is linear. It also tells us that the variance is also constant. The QQ plot that is shown gives me some discomfort. Although there is some question to the normality, we will continue with the test.
+
+####Linear Regression
+
+In order to discuss the hypothesis and our initial question of the relationship between width and length, we must run a simple linear regression test.
+
+```{r}
+pander(summary(KidsFeet.lm))
+```
+
+As we look at the data that is collected and then we look at the simple linear regression that was just performed, we see that both the slope and the intercept are significant, or in other words, they mean something. Both of them have a p-value that is less that 0.05.
+
+###Interpretation
+
+As we look at the tests that were run and the graphics that helped us to view the appropriateness of this test, we are able to see that the normality of the data is questionable. Although we may prefer to have data that is more normal, we continued with the test. With the test we have sufficient evidence to reject the null. We are able to conclude that the length of the child's foot is an explanatory factor of the width of their foot. With a p-value for $B_1$ being 1.097e-05 and p-value of $B_0$ of 0.02315 both of these are significant. 
+
+Being a convenience sample, we might not be able to collect data that is truly normal. By extending this study to more classrooms and more children, we would be able to have more accurate data and thus be more capable of making correct assumptions.
